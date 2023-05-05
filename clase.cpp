@@ -1,20 +1,18 @@
 #include "clase.h"
-
 Data::Data()
 {
-	std::cout << "Introduceti ziua:";
-	std::cin >> zi;
-	//std::cout << "Introduceti luna:\n";
+	//std::cout << "Introduceti ziua:";
+	//std::cin >> zi;
+	//std::cout << "Introduceti luna:";
 	//std::cin >> luna;
-	std::cout << "Introduceti anul:";
-	std::cin >> an;
+	//std::cout << "Introduceti anul:";
+	//std::cin >> an;
 }
-Data::Data(int zi1, const char* luna1, int an1)
+Data::Data(int zi1,std::string luna1, int an1)
 	:zi(zi1), luna(luna1), an(an1)
 {
-	std::cout << zi << " " << luna << " " << an;
 }
-Data::Data(Data& data)
+Data::Data(const Data& data)
 {
 	zi = data.zi;
 	luna = data.luna;
@@ -22,15 +20,12 @@ Data::Data(Data& data)
 }
 Data::~Data()
 {
-	delete& zi;
-	delete[] luna;
-	delete& an;
 }
 int Data::get_zi()
 {
 	return zi;
 }
-const char* Data::get_luna()
+std::string Data::get_luna()
 {
 	return luna;
 }
@@ -49,17 +44,17 @@ std::ostream& operator<<(std::ostream& out, Data& obj)
 	std::cout << obj.zi << " " << obj.luna << " " << obj.an;
 	return out;
 }
-std::istream& operator>>(std::istream& in, Data* obj)
+std::istream& operator>>(std::istream& in, Data& obj)
 {
-	std::cout << "Introduceti ziua,luna si anul";
-	//in >> obj->get_zi() >> obj->get_luna() >> obj->get_an();
+	std::cout << "Introduceti ziua,luna si anul: ";
+	in >> obj.zi >> obj.luna >> obj.an;
 	return in;
 }
 void Data::set_zi(int z)
 {
 	zi = z;
 }
-void Data::set_luna(char* l)
+void Data::set_luna(std::string l)
 {
 	luna = l;
 }
@@ -68,49 +63,67 @@ void Data::set_an(int a)
 	an = a;
 }
 
-Angajat::Angajat()
+const char* Expired::motive()
 {
-	std::cout << "Introduceti numele:";
+	return "Contractul acestui fost angjat s-a terminat inainte de anul 2020\n";
+}
+
+void Angajat::citire()
+{
+	std::cout << "Introduceti numele,prenumele si salariul: ";
 	std::cin >> nume;
-	std::cout << "Introduceti prenumele:";
+	//std::cout << "Introduceti prenumele:";
 	std::cin >> prenume;
-	std::cout << "Introduceti salariul:";
+	//std::cout << "Introduceti salariul:";
 	std::cin >> salariu;
-	//std::cout << "Introduceti data_angajarii";
-	//std::cin >> data_angajare;
-	//std::cout <<nume << " " <<prenume<< " " <<salariu<<" "<<data_angajare;
+	std::cout << "Introduceti data angajarii:";
+	std::cin >> data_angajare;
 }
-Angajat::Angajat(std::string nume1, std::string prenume1, float salariu1, Data data_angajare1)
+void Angajat::afisare()
 {
-	nume = nume1;
-	prenume = prenume1;
-	salariu = salariu1;
-	data_angajare = data_angajare1;
+	std::cout << nume << " " << prenume << " " << salariu << " " << data_angajare << " ";
 }
-Angajat::Angajat(Angajat& angajat)
+void Part_Time::citire()
 {
-	nume = angajat.nume;
-	prenume = angajat.prenume;
-	salariu = angajat.salariu;
-	data_angajare = angajat.data_angajare;
+	Angajat::citire();
+	std::cout << "Introduceti numarul de ore lucrate zilnic:";
+	std::cin >> nr_ore_zi;
+	std::cout << "Introduceti Data finalizarii contractului:";
+	std::cin >> final_contract;
+	try
+	{
+		if (final_contract.get_an() < 2020)
+			throw Expired();
+	}
+	catch (Expired& object)
+	{
+		std::cout << "\n !!!!   ";
+		std::cout << object.motive();
+	}
 }
-std::istream& operator>>(std::istream& in, Angajat* obj)
+void Part_Time::afisare()
 {
-	std::cout << "Introduceti numele,prenumele,salariul si data";
-	//in >> obj->get_nume() >> obj->get_prenume() >> obj->get_salariu() >> obj.get_data_angajare();
-	return in;
+	Angajat::afisare();
+	std::cout << nr_ore_zi << " " << final_contract << std::endl;
 }
-std::ostream& operator<<(std::ostream& out, Angajat& obj)
+void Permanent::citire()
 {
-	std::cout << obj.nume << " " << obj.prenume << " " << obj.salariu << " " << obj.data_angajare;
-	return out;
+	Angajat::citire();
+	std::cout << "Introduceti numarul de copii:";
+	std::cin >> nr_minori_intretinere;
 }
-void Angajat::operator=(const Angajat& obj)
+void Permanent::afisare()
 {
-	nume = obj.nume;
-	prenume = obj.prenume;
-	salariu = obj.salariu;
-	data_angajare = obj.data_angajare;
+	Angajat::afisare();
+	std::cout << nr_minori_intretinere << std::endl;
+}
+Part_Time::Part_Time()
+{
+	Part_Time::citire();
+}
+Permanent::Permanent()
+{
+	Permanent::citire();
 }
 std::string Angajat::get_nume()
 {
@@ -144,105 +157,30 @@ void Angajat::set_data_angajare(Data d)
 {
 	data_angajare = d;
 }
-void Angajat::afisare()
-{
-	std::cout << "Numele: " << nume << " Prenumele: " << prenume << " Salariul: " << salariu;//<< " Data Angajarii" << data_angajare;
-}
-Part_Time::Part_Time()
-{
-	std::cout << "Introduceti nr_ore_Zi:";
-	std::cin >> nr_ore_zi;
-	//std::cout << "Introduceti final_contract:";
-	//std::cin >> final_contract;
-
-}
-Part_Time::Part_Time(int nr_ore_zi1, Data final_contract1)
-{
-	nr_ore_zi = nr_ore_zi1;
-	final_contract = final_contract1;
-}
-Part_Time::Part_Time(Part_Time& part)
-{
-	nr_ore_zi = part.nr_ore_zi;
-	final_contract = part.final_contract;
-}
-std::istream& operator>>(std::istream& in, Part_Time* obj)
-{
-	std::cout << "Introduceti Numarul de ore pe zi si contractul final";
-	//in >> obj->get_nr_ore_zi() >> obj->get_final_contract();
-	return in;
-}
-std::ostream& operator<<(std::ostream& out, Part_Time* obj)
-{
-	//std::cout << obj->get_nr_ore_zi() << " " << obj->get_final_contract();
-	return out;
-}
-void Part_Time::operator=(const Part_Time& obj)
-{
-	nr_ore_zi = obj.nr_ore_zi;
-	final_contract = obj.final_contract;
-}
-/*
-int get_nr_ore_zi()
+int Part_Time::get_nr_ore_zi()
 {
 	return nr_ore_zi;
 }
-Data get_final_contract()
+Data Part_Time::get_final_contract()
 {
 	return final_contract;
 }
-void set_nr_ore_zi(int nr)
+void Part_Time::set_nr_ore_zi(int nr)
 {
 	nr_ore_zi = nr;
 }
-void set_final_contract(Data final)
+void Part_Time::set_final_contract(Data final)
 {
 	final_contract = final;
-}*/
-void Part_Time::afisare()
-{
-	Angajat::afisare();
-	std::cout << " Numarul de ore lucrate pe zi: " << nr_ore_zi;//<< " Data finalizarii contractului " << final_contract;
 }
-Permanent::Permanent()
-{
-	std::cout << "Introduceti nr de copii: ";
-	std::cin >> nr_minori_intretinere;
-}
-Permanent::Permanent(int nr_minori_intretinere1)
-{
-	nr_minori_intretinere = nr_minori_intretinere1;
-}
-Permanent::Permanent(Permanent& perm)
-{
-	nr_minori_intretinere = perm.nr_minori_intretinere;
-}
-std::istream& operator>>(std::istream& in, Permanent* obj)
-{
-	std::cout << "Introduceti nr de minori";
-	in >> obj->nr_minori_intretinere;
-	return in;
-}
-std::ostream& operator<<(std::ostream& out, Permanent& obj)
-{
-	std::cout << obj.nr_minori_intretinere;
-	return out;
-}
-void Permanent::operator=(const Permanent& obj)
-{
-	nr_minori_intretinere = obj.nr_minori_intretinere;
-}
-/*
-int get_nr_minori()
+int Permanent::get_nr_minori()
 {
 	return nr_minori_intretinere;
 }
-void set_nr_minori(int nr)
+void Permanent::set_nr_minori(int nr)
 {
 	nr_minori_intretinere = nr;
-}*/
-void Permanent::afisare()
-{
-	Angajat::afisare();
-	std::cout << " Numarul de copii: " << nr_minori_intretinere;
 }
+Angajat::~Angajat(){}
+Permanent::~Permanent(){}
+Part_Time::~Part_Time(){}
